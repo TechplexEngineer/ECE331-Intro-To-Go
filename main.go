@@ -1,11 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
+
+const (
+	listen = ":9090"
+)
 
 func main() {
-<<<<<<< HEAD
-	print("hello world\n")
-=======
-	fmt.Printf("hello world %d\n", 500)
->>>>>>> 90817b1... Showing "printf"
+	m := http.NewServeMux()
+	m.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, "Hello World")
+	})
+
+	fmt.Printf("Server listening - %s", listen)
+	err := http.ListenAndServe(listen, m)
+	if err != nil {
+		panic(err)
+	}
 }
