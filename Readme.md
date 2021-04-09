@@ -11,3 +11,5 @@ In the Examples Directory
 5. Publishing JSON Data
 6. Visualizing data with Chart.js
 7. Read from sqlite3 database
+
+[Go by Example](https://gobyexample.com/) is a much more complete set of examples.
