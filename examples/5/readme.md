@@ -1,0 +1,1 @@
+Adding a route to publish JSON formatted random data

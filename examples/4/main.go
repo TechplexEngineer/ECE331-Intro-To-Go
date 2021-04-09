@@ -25,7 +25,7 @@ func main() {
 			writer.WriteHeader(500)
 		}
 	})
-	fmt.Printf("Server listening - %s", listen)
+	fmt.Printf("Server listening - %s\n", listen)
 	err = http.ListenAndServe(listen, m)
 	if err != nil {
 		panic(err)

@@ -3,4 +3,10 @@ Intro to Go/Golang for UMaine ECE 331
 
 Some introductory examples of Go.
 
-1. [Hello World](https://github.com/TechplexEngineer/ECE331-Intro-To-Go/tree/1)
+In the Examples Directory
+1. Hello World
+2. Printf
+3. Minimal HTTP Server
+4. HTTP Server with HTML template
+5. Publishing JSON Data
+6. Visualizing data with Chart.js
