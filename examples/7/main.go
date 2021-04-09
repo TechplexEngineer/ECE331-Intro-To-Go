@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"html/template"
 	"log"
 	"math/rand"
@@ -26,6 +28,14 @@ func main() {
 
 	reload := flag.Bool("r", false, "pass this flag to have the template reloaded on each request.")
 	flag.Parse()
+
+	log.Print("Opening Database")
+	db, err := sql.Open("sqlite3", "./data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	log.Print("Done Opening Database")
 
 	tmpl, err := template.ParseFiles("./template.html")
 	if err != nil {
@@ -51,13 +61,42 @@ func main() {
 	})
 
 	m.HandleFunc("/data", func(writer http.ResponseWriter, request *http.Request) {
-		var points []DataPoint
-		for n := 0; n < 5; n++ {
-			points = append(points, DataPoint{
-				Value: getValue(32),
-				Time:  int64(n),
-			})
+
+		rows, err := db.Query("select * from data")
+		if err != nil {
+			log.Printf("unable to query data - %s", err)
+			writer.WriteHeader(500)
+			return
 		}
+		defer rows.Close()
+
+		var points []DataPoint
+
+		i := 0
+		for rows.Next() {
+			var date string
+			var time string
+			var reconfirmed int
+			err = rows.Scan(&date, &time, &reconfirmed)
+			if err != nil {
+				log.Printf("unable to scan row result %d - %s", i, err)
+				writer.WriteHeader(500)
+				return
+			}
+			points = append(points, DataPoint{
+				Value: float64(reconfirmed),
+				Time:  int64(i),
+			})
+			i++
+			//fmt.Println(date, time, reconfirmed)
+		}
+		err = rows.Err()
+		if err != nil {
+			log.Printf("row error - %s", err)
+			writer.WriteHeader(500)
+			return
+		}
+
 		jsonBytes, err := json.MarshalIndent(points, "", "    ")
 		if err != nil {
 			writer.WriteHeader(500)
@@ -69,6 +108,7 @@ func main() {
 			writer.WriteHeader(500)
 			return
 		}
+
 	})
 
 	fmt.Printf("Server listening - %s\n", listen)
